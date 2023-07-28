@@ -28,7 +28,7 @@ public class Contact {
     @OrderBy
     @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
     private List<String> comments;
-    @Column(name = "spam")
+    @Column(name = "spam",nullable = false)
     private Integer spam;
 
     public Contact(String name, String surname, String phone) {

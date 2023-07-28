@@ -1,10 +1,12 @@
 package ru.zinkin.phonebook.appphonebookeuclient.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.zinkin.phonebook.appphonebookeuclient.dao.ContactDao;
 import ru.zinkin.phonebook.appphonebookeuclient.model.entities.Contact;
+
+import java.util.List;
 
 @Service
 public class ContactServiceImpl implements ContactService{
@@ -38,6 +40,26 @@ public class ContactServiceImpl implements ContactService{
     public Boolean delete(Contact contact) {
         contactDao.delete(contact);
         return !exist(contact.getPhone());
+    }
+
+    @Override
+    public Boolean addComment(String number, String comment){
+        if(exist(number)){
+            Contact c = findByPhone(number);
+            if(c.getComments().stream().anyMatch(x -> x.equals(comment))){
+                return false;
+            }
+            c.getComments().add(comment);
+            contactDao.save(c);
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
+    public List<Contact> getAll(){
+        return contactDao.findAll(Sort.by("name"));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ru.zinkin.phonebook.appphonebookeuclient.model.dto;
+package ru.zinkin.phonebook.appphonebookeuclient.model.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonSerialize
-public class ContactDto {
+public class ResponseContactDto {
 
     @JsonView
     private String name;
