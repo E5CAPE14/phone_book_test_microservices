@@ -1,0 +1,5 @@
+rootProject.name = 'micro_phone_book'
+
+includeBuild 'eureka-server'
+includeBuild 'app-phone-book-eu-client'
+includeBuild 'api-gateway'
