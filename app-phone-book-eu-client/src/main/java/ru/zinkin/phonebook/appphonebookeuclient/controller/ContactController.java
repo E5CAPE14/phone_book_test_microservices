@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.zinkin.phonebook.appphonebookeuclient.model.dto.request.RequestCommentDto;
 import ru.zinkin.phonebook.appphonebookeuclient.model.dto.request.RequestContactDto;
 import ru.zinkin.phonebook.appphonebookeuclient.model.dto.response.ResponseContactDto;
+import ru.zinkin.phonebook.appphonebookeuclient.model.dto.response.ResponseString;
 import ru.zinkin.phonebook.appphonebookeuclient.model.entities.Contact;
 import ru.zinkin.phonebook.appphonebookeuclient.service.ContactService;
 
@@ -41,7 +42,7 @@ public class ContactController {
             }
             return ResponseEntity.ok(responseContactDto);
         }
-        return ResponseEntity.badRequest().body("Контакта с таким номером не существует");
+        return ResponseEntity.badRequest().body(new ResponseString("Контакта с таким номером не существует"));
     }
     @GetMapping("/find/all")
     public ResponseEntity<List<ResponseContactDto>> findAll(){
@@ -62,20 +63,24 @@ public class ContactController {
     }
 
     @GetMapping("/info")
-    public ResponseEntity<String> getInfo(){
-        return ResponseEntity.ok("Микро-сервис телефонной книги.");
+    public ResponseEntity<?> getInfo(){
+        return ResponseEntity.ok(new ResponseString("Микро-сервис телефонной книги."));
     }
 
     @PutMapping("/add/spam")
-    public ResponseEntity<String> incrementSpam(@RequestBody String phone){
-        if(contactService.updateUserSpam(phone)){
-            return ResponseEntity.ok("Проголосовано!");
+    public ResponseEntity<?> incrementSpam(@RequestBody String phone){
+        if(phone.contains("\"")){
+            phone = phone.replace("\"","");
         }
-        return ResponseEntity.badRequest().body("Пользователь не найден!");
+        if(contactService.exist(phone)){
+            contactService.updateUserSpam(phone);
+            return ResponseEntity.ok(new ResponseString("Проголосовано!"));
+        }
+        return ResponseEntity.badRequest().body(new ResponseString("Пользователь не найден!"));
     }
 
     @PutMapping("/add/comment")
-    public ResponseEntity<String> addComment(@RequestBody RequestCommentDto commentDto){
+    public ResponseEntity<?> addComment(@RequestBody RequestCommentDto commentDto){
         StringBuilder stringBuilder = new StringBuilder();
         if(!contactService.exist(commentDto.getPhone())){
             stringBuilder.append("Пользователь не найден!");
@@ -86,19 +91,19 @@ public class ContactController {
                 stringBuilder.append("Комментарий уже существует");
             }
         }
-        return ResponseEntity.badRequest().body(stringBuilder.toString());
+        return ResponseEntity.badRequest().body(new ResponseString(stringBuilder.toString()));
     }
 
     @PostMapping("/add/contact")
     public ResponseEntity<?> saveContact(@RequestBody RequestContactDto requestContactDto){
         if(contactService.exist(requestContactDto.getPhone())){
-            return ResponseEntity.badRequest().body("Такой номер в БД уже существует!");
+            return ResponseEntity.badRequest().body(new ResponseString("Такой номер в БД уже существует!"));
         }
         contactService.save(new Contact(
                 requestContactDto.getName(),
                 requestContactDto.getSurname(),
                 requestContactDto.getPhone()
         ));
-        return ResponseEntity.ok(String.format("Пользователь c номером телефона %s сохранен!",requestContactDto.getPhone()));
+        return ResponseEntity.ok(new ResponseString(String.format("Пользователь c номером телефона %s сохранен!",requestContactDto.getPhone())));
     }
 }

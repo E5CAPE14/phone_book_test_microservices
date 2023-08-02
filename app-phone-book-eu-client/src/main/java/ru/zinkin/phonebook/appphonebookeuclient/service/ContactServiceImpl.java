@@ -29,19 +29,16 @@ public class ContactServiceImpl implements ContactService{
     public Contact findByPhone(String phone) throws RuntimeException {
         return contactDao.findByPhone(phone).orElseThrow(() -> new RuntimeException("Пользователь не найден!"));
     }
-
     @Override
     public Boolean save(Contact contact) {
         Contact contact1 = contactDao.save(contact);
         return contact1.getId() != null;
     }
-
     @Override
     public Boolean delete(Contact contact) {
         contactDao.delete(contact);
         return !exist(contact.getPhone());
     }
-
     @Override
     public Boolean addComment(String number, String comment){
         if(exist(number)){
@@ -55,18 +52,16 @@ public class ContactServiceImpl implements ContactService{
         }
         return false;
     }
-
-
     @Override
     public List<Contact> getAll(){
-        return contactDao.findAll(Sort.by("name"));
+        return contactDao.findAll(Sort.by("name").ascending());
     }
-
     @Override
     public Boolean updateUserSpam(String contact) {
         if(exist(contact)){
             Contact c = findByPhone(contact);
-            c.setSpam(c.getSpam() + 1);
+            int spamVote = c.getSpam() + 1;
+            c.setSpam(spamVote);
             contactDao.save(c);
             return true;
         }
